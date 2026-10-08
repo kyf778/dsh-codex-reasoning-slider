@@ -1,0 +1,4 @@
+insert:
+  - id: dsh-codex-reasoning-slider
+    name: '@local/dsh-codex-reasoning-slider'
+    config: {}
