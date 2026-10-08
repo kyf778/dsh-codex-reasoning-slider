@@ -1,0 +1,55 @@
+{
+  "name": "@local/dsh-codex-reasoning-slider",
+  "version": "1.0.0",
+  "author": "kyf778 <694982318@qq.com>",
+  "description": "Codex-style reasoning-effort slider for the DeepSeek Harness model picker.",
+  "keywords": [
+    "dsh",
+    "deepseek-harness",
+    "reasoning-slider",
+    "codex",
+    "plugin"
+  ],
+  "license": "MIT",
+  "icon": "./icon.svg",
+  "type": "module",
+  "main": "./index.js",
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "cordis.patch.yml",
+    "icon.svg",
+    "README.md",
+    "LICENSE"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kyf778/dsh-codex-reasoning-slider.git"
+  },
+  "bugs": {
+    "url": "https://github.com/kyf778/dsh-codex-reasoning-slider/issues"
+  },
+  "homepage": "https://github.com/kyf778/dsh-codex-reasoning-slider#readme",
+  "peerDependencies": {
+    "@deepseek-ai/dsh": ">=0.2.0-rc.2"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-conversation",
+        "@deepseek-ai/dsh-client-ui-model-selection",
+        "@deepseek-ai/dsh-client-locale"
+      ]
+    }
+  }
+}
