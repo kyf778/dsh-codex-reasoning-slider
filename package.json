@@ -2,7 +2,7 @@
   "name": "@local/dsh-codex-reasoning-slider",
   "version": "1.0.0",
   "author": "kyf778 <694982318@qq.com>",
-  "description": "Codex-style reasoning-effort slider for the DeepSeek Harness model picker.",
+  "description": "Codex-style reasoning-effort slider for the DeepSeek Harness model picker (standalone plugin, based on Nachoneko_miao's original).",
   "keywords": [
     "dsh",
     "deepseek-harness",
@@ -51,5 +51,8 @@
         "@deepseek-ai/dsh-client-locale"
       ]
     }
-  }
+  },
+  "contributors": [
+    "Nachoneko_miao (original DSH Codex reasoning effort slider, MIT)"
+  ]
 }

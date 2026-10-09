@@ -1,7 +1,13 @@
 MIT License
 
+Copyright (c) 2026 Nachoneko_miao
+  (original "DSH Codex reasoning effort slider" — https://github.com/bakabaicai/DSH-Codex-reasoning-effort-slider)
 Copyright (c) 2026 kyf778
-Copyright (c) 2026 Nachoneko_miao (original Codex-style slider, MIT)
+  (standalone plugin split, model-ordering support, and other modifications)
+
+This project is a derivative work of the MIT-licensed project named above.
+The original copyright notice and this permission notice are retained as the
+MIT License requires.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
