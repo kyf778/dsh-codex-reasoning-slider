@@ -541,7 +541,12 @@ window.__ModuleLoader__.load({
               onClick: () => { setError(''); load(); } }, icon('reset', true))) : null));
     }
     return {
-      inject: ['slots', 'modelDirectories', 'sessions', 'locale'],
+      // remote and remote.session must be listed even though this component
+      // never reads them directly: ctx.modelDirectories.directoryFor() resolves
+      // them inside the model-selection service, and omitting them makes the
+      // slot throw "cannot get property remote.session without inject", after
+      // which DSH abdicates the entry and the native picker takes over.
+      inject: ['slots', 'modelDirectories', 'sessions', 'locale', 'remote', 'remote.session'],
       apply(ctx) {
         ctx.effect(() => ctx.locale.register(NS, { zh, en }));
         ctx.slots.inject('conversation.input.model', () => ctx.slots.register({
