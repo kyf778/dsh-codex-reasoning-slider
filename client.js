@@ -513,9 +513,6 @@ window.__ModuleLoader__.load({
               h('span', { className: 'dsh-codex-reasoning-effort-slider-heading' }, currentLabel || t('choose'), icon('chevron', true)),
               h('span', { className: 'dsh-codex-reasoning-effort-slider-model' }, modelName)),
             h('div', { className: 'dsh-codex-reasoning-effort-slider-warning' }, h('span', null, t('warning'))),
-            h('button', { className: 'dsh-codex-reasoning-effort-slider-tool dsh-codex-reasoning-effort-slider-reset', disabled: busy || !model?.reasoning, 'aria-label': t('reset'),
-              onClick: () => { chooseEffort(model?.reasoning?.defaultEffort); }
-            }, icon('reset'), h('span', { className: 'dsh-codex-reasoning-effort-slider-tooltip', role: 'tooltip' }, t('reset'))),
             efforts.length ? h('div', { className: `dsh-codex-reasoning-effort-slider-rail${dragging ? ' dragging' : ''}${efforts.length < 2 ? ' dsh-codex-reasoning-effort-slider-railSingle' : ''}`, ref: railRef,
               style: { '--dsh-codex-reasoning-effort-slider-pos': fraction }, role: 'slider', tabIndex: 0,
               'aria-label': t('effort'), 'aria-valuemin': 0, 'aria-valuemax': efforts.length - 1,
