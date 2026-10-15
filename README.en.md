@@ -14,6 +14,10 @@ A Codex-style **reasoning-effort slider** that replaces the model picker in Deep
 - Particle animation on the Ultra level
 - A search box appears automatically when there are more than 4 models
 - Reads the model order saved by [dsh-model-order-settings](https://github.com/kyf778/dsh-model-order-settings)
+- **Sticky provider headings**: while you scroll, the provider name pins to the top of the
+  list with a solid fill, and the next provider pushes it away. At the top of the list the
+  heading stays transparent, so it never covers content for no reason — the same behaviour
+  as DSH's own model menu
 
 ## Credits and attribution
 
@@ -31,6 +35,7 @@ Changes made in this plugin relative to the original:
 
 - split into a standalone plugin that handles the slider only (model ordering moved to its own plugin)
 - added: reads and applies the user's saved model order
+- added: sticky provider group headings (reuses DSH's own `observeStickyMenuGroups` from `ui-primitives`)
 - removed: the reset-to-default button in the popup's top-right corner
 
 > Original author: Nachoneko_miao. If you like it, please also star the

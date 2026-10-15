@@ -13,6 +13,8 @@
 - Ultra 档位的粒子动效
 - 模型超过 4 个时自动出现搜索框
 - 会读取 [dsh-model-order-settings](https://github.com/kyf778/dsh-model-order-settings) 保存的模型顺序
+- **提供商分组标题会吸顶**：滚动时分组名固定在列表顶端并显示底色，下一个分组把它顶走；
+  停在列表顶部时标题保持透明，不会无谓地挡内容（与原生 DSH 模型菜单的效果一致）
 
 ## 来源与致谢
 
@@ -28,6 +30,7 @@
 
 - 拆成独立插件，只负责滑块本身（模型排序已分离为单独插件）
 - 新增：读取并应用用户自定义的模型排序
+- 新增：提供商分组标题吸顶（复用 DSH 官方 `ui-primitives` 的 `observeStickyMenuGroups`）
 - 移除：弹窗右上角的重置按钮
 
 > 原版作者：Nachoneko_miao。如果喜欢，也请给[原仓库](https://github.com/bakabaicai/DSH-Codex-reasoning-effort-slider)点个 Star。

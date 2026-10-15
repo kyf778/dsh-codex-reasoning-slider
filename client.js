@@ -4,6 +4,14 @@ window.__ModuleLoader__.load({
     const React = require('react');
     const h = React.createElement;
     const { useState, useEffect, useLayoutEffect, useRef, useSyncExternalStore } = React;
+    // DSH ships the menu-group sticky-heading machinery in ui-primitives: the
+    // heading is `position:sticky` and only gets the theme's 94%-opaque fill
+    // once an observation proves the group crossed the viewport top. Reuse it
+    // rather than reimplementing the observers. The require is guarded: if the
+    // package is absent from the module table the headings still stick (CSS
+    // owns that) and merely stay transparent, so the picker never breaks.
+    const primitives = (() => { try { return require('@deepseek-ai/dsh-client-ui-primitives'); } catch { return null; } })();
+    const observeStickyMenuGroups = primitives && primitives.observeStickyMenuGroups;
     const NS = 'dsh-codex-reasoning-slider';
     const zh = {
       choose: '选择模型', effort: '思考等级',
@@ -135,7 +143,10 @@ window.__ModuleLoader__.load({
       .dsh-codex-reasoning-effort-slider-searchBack:hover{background:var(--dsw-alias-interactive-bg-hover);color:var(--dsw-alias-label-primary)}
       .dsh-codex-reasoning-effort-slider-menu-back{display:flex;align-items:center;justify-content:center;flex:none;width:22px;height:22px;padding:0;border-radius:5px;background:transparent;color:inherit}
       .dsh-codex-reasoning-effort-slider-menu-back:hover{background:var(--dsw-alias-interactive-bg-hover)}
-      .dsh-codex-reasoning-effort-slider-group{height:22px;padding:3px 8px;color:var(--dsw-alias-label-secondary);font-size:11px}
+      .dsh-codex-reasoning-effort-slider-groupWrap{position:relative}
+      .dsh-codex-reasoning-effort-slider-groupStart{position:absolute;top:0;left:0;width:1px;height:1px;opacity:0;pointer-events:none}
+      .dsh-codex-reasoning-effort-slider-group{position:sticky;top:0;z-index:1;height:22px;padding:3px 8px;border-radius:var(--dsw-radius-md,6px);color:var(--dsw-alias-label-secondary);font-size:11px;background:transparent;transition:background-color .12s ease}
+      .dsh-codex-reasoning-effort-slider-group[data-stuck]{background:var(--dsw-alias-menu-group-header-fill,var(--dsw-specific-menu,var(--dsw-alias-bg-layer-2)))}
       .dsh-codex-reasoning-effort-slider-option{width:100%;height:30px;display:flex;align-items:center;justify-content:space-between;gap:8px;text-align:left;padding:0 8px;border-radius:8px;background:transparent;color:var(--dsw-alias-label-primary);font-size:13px!important}
       .dsh-codex-reasoning-effort-slider-option:hover,.dsh-codex-reasoning-effort-slider-option:focus-visible{background:var(--dsw-alias-interactive-bg-hover)}
       .dsh-codex-reasoning-effort-slider-option-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:19px}
@@ -197,6 +208,7 @@ window.__ModuleLoader__.load({
       const rootRef = useRef(null), popupRef = useRef(null), railRef = useRef(null);
       const canvasRef = useRef(null), burstRef = useRef(null), triggerRef = useRef(null);
       const previewRef = useRef(null), dragRef = useRef(false), mountedRef = useRef(true);
+      const modelsListRef = useRef(null);
       const busyRef = useRef(false);
       const timersRef = useRef([]);
       const latest = useRef({});
@@ -468,6 +480,20 @@ window.__ModuleLoader__.load({
       useEffect(() => {
         if (pane !== 'models') setQuery('');
       }, [pane]);
+      // Sticky group headings: CSS owns the pinning (`.…-group` is sticky), and
+      // this effect only tells DSH's observer when it may look at the list. The
+      // observer is created when the list is really visible — while the popup is
+      // closed or the effort pane is showing, the scroll container has no
+      // measurable viewport, so observing then would compute nothing. The
+      // signature re-runs it after filtering, because the observer captures its
+      // group set at setup.
+      const groupSignature = filteredGroups.map(provider => `${provider.id}:${provider.models.length}`).join('|');
+      useEffect(() => {
+        if (!open || pane !== 'models' || !observeStickyMenuGroups) return;
+        const viewport = modelsListRef.current;
+        if (!viewport) return;
+        return observeStickyMenuGroups(viewport);
+      }, [open, pane, groupSignature]);
       const modelsView = h('div', { className: `dsh-codex-reasoning-effort-slider-pane dsh-codex-reasoning-effort-slider-models${pane !== 'models' ? ' hidden' : ''}`,
         role: 'menu', 'aria-label': t('model'), inert: pane !== 'models' ? '' : undefined, onKeyDown: modelKeyDown },
         h('div', { className: 'dsh-codex-reasoning-effort-slider-searchRow' },
@@ -481,9 +507,12 @@ window.__ModuleLoader__.load({
             }),
             query !== '' ? h('button', { className: 'dsh-codex-reasoning-effort-slider-searchClear', type: 'button', 'aria-label': t('search'), title: t('search'),
               onClick: () => setQuery('') }, '\u00d7') : null) : null),
-        h('div', { className: 'dsh-codex-reasoning-effort-slider-modelsList' },
-          ...filteredGroups.map(provider => h('div', { key: provider.id },
-            filteredGroups.length > 1 ? h('div', { className: 'dsh-codex-reasoning-effort-slider-group' }, provider.name) : null,
+        h('div', { className: 'dsh-codex-reasoning-effort-slider-modelsList', ref: modelsListRef },
+          ...filteredGroups.map(provider => h('div', {
+            key: provider.id, className: 'dsh-codex-reasoning-effort-slider-groupWrap', 'data-menu-group': ''
+          },
+            filteredGroups.length > 1 ? h('span', { className: 'dsh-codex-reasoning-effort-slider-groupStart', 'data-menu-group-start': '', 'aria-hidden': true }) : null,
+            filteredGroups.length > 1 ? h('div', { className: 'dsh-codex-reasoning-effort-slider-group', 'data-menu-group-heading': '' }, provider.name) : null,
             ...provider.models.map(option => h('button', {
               key: option.id, className: 'dsh-codex-reasoning-effort-slider-option', role: 'menuitemradio',
               'aria-checked': selection?.provider === provider.id && selection?.model === option.id,
