@@ -18,6 +18,9 @@ A Codex-style **reasoning-effort slider** that replaces the model picker in Deep
   list with a solid fill, and the next provider pushes it away. At the top of the list the
   heading stays transparent, so it never covers content for no reason — the same behaviour
   as DSH's own model menu
+  - the pinned fill is **fully opaque**: an opaque surface colour sits beneath the theme's
+    94%-opaque group-header fill. Using that 6% translucency alone let the glyphs of the row
+    scrolling underneath bleed through the pinned label, which read as overlapping text
 
 ## Credits and attribution
 
