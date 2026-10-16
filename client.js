@@ -12,6 +12,28 @@ window.__ModuleLoader__.load({
     // owns that) and merely stay transparent, so the picker never breaks.
     const primitives = (() => { try { return require('@deepseek-ai/dsh-client-ui-primitives'); } catch { return null; } })();
     const observeStickyMenuGroups = primitives && primitives.observeStickyMenuGroups;
+    // DSH's built-in `/model` picker searches through this same ranker
+    // (`searchMode: 'fuzzy-label'`), so reusing it keeps both pickers agreeing
+    // on what a query means. The require above is guarded, so a build without
+    // the package falls back to substring matching instead of breaking the picker.
+    const rankByName = primitives && primitives.rankByName;
+    /** Plain case-insensitive substring match, used when rankByName is absent. */
+    function matchSubstring(models, query) {
+      const needle = query.toLowerCase();
+      return models.filter(option => String(option.name || option.id).toLowerCase().includes(needle));
+    }
+    /**
+     * Filter one provider's models by the typed query. rankByName matches the
+     * query as a case-insensitive ordered subsequence of the name (so "ds"
+     * finds "Deepseek-V4.1-Flash") and ranks prefix hits first. The official
+     * picker ranks the raw model rows the same way; a model without a name
+     * falls back to its id as the search key, which is what substring matching
+     * used to cover.
+     */
+    function matchModels(models, query) {
+      if (!rankByName) return matchSubstring(models, query);
+      return rankByName(models.map(option => ({ ...option, name: String(option.name || option.id) })), query);
+    }
     const NS = 'dsh-codex-reasoning-slider';
     const zh = {
       choose: '选择模型', effort: '思考等级',
@@ -466,10 +488,10 @@ window.__ModuleLoader__.load({
       const currentLabel = labels[displayed] || state.retainedEffort || '';
       const triggerLabel = labels[savedEffort] || state.retainedEffort || '';
       const modelCount = state.groups.reduce((count, provider) => count + provider.models.length, 0);
-      const needle = query.trim().toLowerCase();
+      const needle = query.trim();
       const orderedGroups = applyOrder(state.groups, orderSnapshot);
       const filteredGroups = needle === '' ? orderedGroups : orderedGroups
-        .map(provider => ({ ...provider, models: provider.models.filter(option => (option.name || option.id).toLowerCase().includes(needle)) }))
+        .map(provider => ({ ...provider, models: matchModels(provider.models, needle) }))
         .filter(provider => provider.models.length > 0);
       const filteredCount = filteredGroups.reduce((count, provider) => count + provider.models.length, 0);
       const showSearch = modelCount > 4;

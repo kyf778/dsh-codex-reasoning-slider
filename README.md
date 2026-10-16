@@ -12,6 +12,8 @@
 - 把原生模型下拉换成 Codex 风格滑条（Off / Low / High / Ultra 四档）
 - Ultra 档位的粒子动效
 - 模型超过 4 个时自动出现搜索框
+  - 搜的是**模糊子序列**，和官方 `/model` 选择器用的是同一个排序器（DSH `ui-primitives` 的
+    `rankByName`）：输入 `ds` 就能找到 `Deepseek-V4.1-Flash`，前缀命中的排在前面
 - 会读取 [dsh-model-order-settings](https://github.com/kyf778/dsh-model-order-settings) 保存的模型顺序
 - **提供商分组标题会吸顶**：滚动时分组名固定在列表顶端并显示底色，下一个分组把它顶走；
   停在列表顶部时标题保持透明，不会无谓地挡内容（与原生 DSH 模型菜单的效果一致）

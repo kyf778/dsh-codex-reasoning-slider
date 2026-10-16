@@ -13,6 +13,9 @@ A Codex-style **reasoning-effort slider** that replaces the model picker in Deep
 - Replaces the plain model dropdown with a Codex-style slider (Off / Low / High / Ultra)
 - Particle animation on the Ultra level
 - A search box appears automatically when there are more than 4 models
+  - it searches by **fuzzy subsequence**, through the same ranker DSH's own `/model`
+    picker uses (`rankByName` from `ui-primitives`): typing `ds` finds
+    `Deepseek-V4.1-Flash`, and prefix hits rank first
 - Reads the model order saved by [dsh-model-order-settings](https://github.com/kyf778/dsh-model-order-settings)
 - **Sticky provider headings**: while you scroll, the provider name pins to the top of the
   list with a solid fill, and the next provider pushes it away. At the top of the list the
