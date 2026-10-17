@@ -24,6 +24,10 @@ A Codex-style **reasoning-effort slider** that replaces the model picker in Deep
   - the pinned fill is **fully opaque**: an opaque surface colour sits beneath the theme's
     94%-opaque group-header fill. Using that 6% translucency alone let the glyphs of the row
     scrolling underneath bleed through the pinned label, which read as overlapping text
+  - the heading's colour and weight now **match DSH's own menu headings**
+    (`label-tertiary` + weight 500). Upstream used `label-secondary` + 400, one step heavier
+    than the model rows' own label colour, which made the heading and the rows look like
+    two different palettes
 
 ## Credits and attribution
 
