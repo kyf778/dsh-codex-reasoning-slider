@@ -113,7 +113,7 @@ window.__ModuleLoader__.load({
       .dsh-codex-reasoning-effort-slider-compact{display:var(--dsh-composer-model-icon-display,none)}
       .dsh-codex-reasoning-effort-slider-root button:disabled{cursor:default;opacity:.5}
       .dsh-codex-reasoning-effort-slider-root button:focus-visible,.dsh-codex-reasoning-effort-slider-rail:focus-visible{outline:2px solid var(--dsw-focus-ring-color);outline-offset:2px}
-      .dsh-codex-reasoning-effort-slider-popup{position:fixed;bottom:var(--dsh-codex-reasoning-effort-slider-bottom,40px);left:var(--dsh-codex-reasoning-effort-slider-left,12px);width:272px;max-width:calc(100vw - 24px);height:var(--dsh-codex-reasoning-effort-slider-height,104px);max-height:calc(100vh - var(--dsh-codex-reasoning-effort-slider-bottom,40px) - 12px);padding:0;background:var(--dsw-specific-menu,var(--dsw-alias-bg-layer-2));border-radius:14px;box-shadow:var(--dsw-elevation-panel);backdrop-filter:var(--dsw-menu-backdrop-filter);z-index:120;transform-origin:bottom left;transition:opacity .18s ease,transform .18s ease,height .2s cubic-bezier(.2,.8,.2,1),visibility 0s}
+      .dsh-codex-reasoning-effort-slider-popup{position:absolute;bottom:var(--dsh-codex-reasoning-effort-slider-bottom,40px);left:var(--dsh-codex-reasoning-effort-slider-left,12px);width:272px;max-width:calc(100vw - 24px);height:var(--dsh-codex-reasoning-effort-slider-height,104px);max-height:calc(100vh - 96px);padding:0;background:var(--dsw-specific-menu,var(--dsw-alias-bg-layer-2));border-radius:14px;box-shadow:var(--dsw-elevation-panel);backdrop-filter:var(--dsw-menu-backdrop-filter);z-index:120;transform-origin:bottom left;transition:opacity .18s ease,transform .18s ease,height .2s cubic-bezier(.2,.8,.2,1),visibility 0s}
       .dsh-codex-reasoning-effort-slider-popup.closed{opacity:0;pointer-events:none;visibility:hidden;transform:translateY(5px) scale(.98);transition-delay:0s,0s,0s,.18s}
       .dsh-codex-reasoning-effort-slider-pane{position:absolute;left:0;right:0;bottom:0;opacity:1;transform:translateY(0);transition:opacity .14s ease,transform .2s ease,visibility 0s}
       .dsh-codex-reasoning-effort-slider-pane.hidden{opacity:0;pointer-events:none;visibility:hidden;transform:translateY(5px);transition-delay:0s,0s,.14s}
@@ -333,11 +333,28 @@ window.__ModuleLoader__.load({
         function align() {
           const trigger = triggerRef.current?.getBoundingClientRect();
           const popup = popupRef.current;
-          if (!trigger || !popup) return;
+          const root = rootRef.current;
+          if (!trigger || !popup || !root) return;
           const width = Math.min(272, innerWidth - 24);
-          const left = Math.max(12, Math.min((trigger.left + trigger.right - width) / 2, innerWidth - width - 12));
-          rootRef.current.style.setProperty('--dsh-codex-reasoning-effort-slider-left', `${left}px`);
-          rootRef.current.style.setProperty('--dsh-codex-reasoning-effort-slider-bottom', `${Math.max(12, innerHeight - trigger.top + 8)}px`);
+          // Where the popup should land in VIEWPORT coordinates: centred on the
+          // trigger, its bottom 8px above the trigger's top.
+          const wantLeft = Math.max(12, Math.min((trigger.left + trigger.right - width) / 2, innerWidth - width - 12));
+          const wantBottom = innerHeight - trigger.top + 8;
+          const apply = (left, bottom) => {
+            root.style.setProperty('--dsh-codex-reasoning-effort-slider-left', `${left}px`);
+            root.style.setProperty('--dsh-codex-reasoning-effort-slider-bottom', `${bottom}px`);
+          };
+          apply(wantLeft, wantBottom);
+          // The popup is positioned against a containing block that is not
+          // necessarily the viewport (any ancestor with a filter/transform/
+          // backdrop-filter becomes one), so the numbers above can land it
+          // somewhere else entirely. Measure once and correct by the delta —
+          // that works without knowing which ancestor claimed the block.
+          const box = popup.getBoundingClientRect();
+          if (box.width === 0) return;
+          const dLeft = box.left - wantLeft;
+          const dBottom = box.bottom - (innerHeight - wantBottom);
+          if (Math.abs(dLeft) > 0.5 || Math.abs(dBottom) > 0.5) apply(wantLeft - dLeft, wantBottom + dBottom);
         }
         function resized() {
           cancelAnimationFrame(layoutFrame);
